@@ -66,5 +66,9 @@ describe('Parser', function () {
         it('should parse stuff starting with raw string', function () {
             firstPassStructure('hello (world)').should.equal('(raw hello ) (group.paren (raw world))');
         });
+
+        it('should yell if whole input not parsed', function () {
+            firstPassStructure('hello (world) (bob').should.equal('error');
+        });
     });
 });
