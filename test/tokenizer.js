@@ -2,7 +2,8 @@
 
 require('chai').should();
 
-var tokenize = require('../lib/tokenizer').tokenize;
+var grammar = require('../etc/grammar');
+var tokenize = require('../lib/tokenizer').tokenize.bind(undefined, grammar.tokens);
 
 describe('Tokenizer', function () {
 

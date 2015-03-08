@@ -1,7 +1,7 @@
 require('chai').should();
 
 var parser = require('../lib/parser');
-var putils = require('../lib/parser-utils.js');
+var putils = require('../lib/parser-utils');
 
 function firstPassStructure (str, withPos) {
     var result = parser.firstPass(str);
@@ -9,6 +9,15 @@ function firstPassStructure (str, withPos) {
         return 'error';
     } else {
         return putils.structureString(result.expression, withPos);
+    }
+}
+
+function secondPassStructure (str, withPos) {
+    var result = parser.secondPass(str);
+    if (result.error) {
+        return 'error';
+    } else {
+        return putils.structureString(result, withPos);
     }
 }
 
@@ -69,6 +78,24 @@ describe('Parser', function () {
 
         it('should yell if whole input not parsed', function () {
             firstPassStructure('hello (world) (bob').should.equal('error');
+        });
+    });
+
+    describe('Second Pass', function () {
+        it('should identify identifier', function () {
+            secondPassStructure('hi').should.equal('(const.identifier hi)');
+        });
+
+        it('should identify identifiers', function () {
+            secondPassStructure('hello world').should.equal('(const.identifier hello) (const.identifier world)');
+        });
+
+        it('should identify nested stuff', function () {
+            secondPassStructure('(sum 1 2)').should.equal('(group.paren (const.identifier sum) (const.int 1) (const.int 2))');
+        });
+
+        it('should identify deeply nested stuff', function () {
+            secondPassStructure('[blah (sum 1 2.5)]').should.equal('(group.square (const.identifier blah) (group.paren (const.identifier sum) (const.int 1) (const.float 2.5)))');
         });
     });
 });
